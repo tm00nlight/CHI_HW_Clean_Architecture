@@ -25,9 +25,15 @@ class RemoteDataSource : MarvelDataSource {
     }
 
     override suspend fun fetchData(): Flow<List<Marvel>> {
-        val result = Injection.provideMarvelApi().getMarvels().execute()
-        if (result.isSuccessful) {
-            return flow { result.body()!!.map { m -> m.toDbModel() } }
+        try {
+            val result = Injection.provideMarvelApi().getMarvels()
+//        println(result.body())
+            if (result.isSuccessful) {
+//            return flow { result.body()!!.map { m -> m.toDbModel() } }
+                return flow { emit(result.body()!!.map { m -> m.toDbModel() }) }
+            }
+        } catch (e: java.lang.Exception) {
+            println(e.message)
         }
 
         return Injection.provideLocalDataSource().fetchData()

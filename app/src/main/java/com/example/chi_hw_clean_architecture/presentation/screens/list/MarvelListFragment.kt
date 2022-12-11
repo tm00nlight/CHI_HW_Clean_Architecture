@@ -41,25 +41,22 @@ class MarvelListFragment : Fragment() {
 
         with(binding.root) {
             layoutManager = LinearLayoutManager(context)
-            adapter = MarvelRecyclerViewAdapter(listOf())
+//            adapter = MarvelRecyclerViewAdapter(listOf())
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.marvels.collect {
+                    if (it is MarvelUIState.Empty) binding.root.adapter = MarvelRecyclerViewAdapter(
+                        emptyList()
+                    ) else {
+                        (it as MarvelUIState.Success).list.map { m -> m.toUiModel() }.toList().run {
+                            binding.root.adapter = MarvelRecyclerViewAdapter(this)
+                        }
+                    }
+                }
+            }
+
         }
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            viewModel.marvels.collect {
-                if (it is MarvelUIState.Empty) binding.root.adapter = MarvelRecyclerViewAdapter(
-                    emptyList()
-                ) else {
-                    (it as MarvelUIState.Success).list.map { m -> m.toUiModel() }.toList().run {
-                        binding.root.adapter = MarvelRecyclerViewAdapter(this)
-                    }
-                }
-            }
-        }
-    }
 
 }

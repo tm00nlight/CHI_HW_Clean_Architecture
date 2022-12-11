@@ -14,14 +14,15 @@ class MarvelListViewModel(
     private val getMarvels: GetMarvels, private val saveMarvels: SaveMarvels
 ) : ViewModel() {
 
-//    private var _marvels: MutableStateFlow<List<Marvel>> = MutableStateFlow(emptyList())
+    //    private var _marvels: MutableStateFlow<List<Marvel>> = MutableStateFlow(emptyList())
     private var _marvels = MutableStateFlow<MarvelUIState>(MarvelUIState.Empty())
-    var marvels = _marvels.asStateFlow()
+
+        var marvels = _marvels.asStateFlow()
+
 
     suspend fun fetchMarvels() = viewModelScope.launch {
 //        _marvels.value = getMarvels.execute().single()
         _marvels.value = MarvelUIState.Success(getMarvels.execute().single())
-        marvels = _marvels.asStateFlow()
         println((marvels.value as MarvelUIState.Success).list)
     }
 
